@@ -16,9 +16,28 @@ require 'pry'
 require 'json'
 
 def connect_to_api(url)
-  get_data = RestClient.get(url)
-  JSON.parse(get_data)
+  response = RestClient.get(url)
+  JSON.parse(response)
+end
+
+def find_stories(response)
+  stories = response["data"]["children"]
+  puts "Reddit has blessed us with #{stories.count} stories"
+  return stories
+end
+
+def print_stories(stories)
+  stories.each do |story|
+    create_story_hash(story["data"])
+  end
+end
+
+def create_story_hash(story)
+  new_story = {title:story["title"], category: story["subreddit"], upvotes: story["ups"]}
+  puts new_story
 end
 
 reddit_url = "http://www.reddit.com/.json"
-connect_to_api(reddit_url)
+reddit_json_response = connect_to_api(reddit_url)
+stories = find_stories(reddit_json_response)
+print_stories(stories)
